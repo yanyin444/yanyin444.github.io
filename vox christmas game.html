@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vox Christmas Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            line-height: 1.7;
+            padding: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            background-image: radial-gradient(#222222 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .game-container {
+            border: 2px solid #ffffff;
+            border-radius: 2px;
+            padding: 30px;
+            margin-bottom: 25px;
+            min-height: 480px;
+            background-color: rgba(0, 0, 0, 0.85);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ffffff, transparent);
+        }
+        
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            letter-spacing: 3px;
+            padding-bottom: 15px;
+            position: relative;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+        
+        .title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            right: 25%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffffff, transparent);
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            color: #cccccc;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+        
+        .story-text {
+            font-size: 1.25em;
+            margin-bottom: 35px;
+            padding: 20px;
+            border-left: 4px solid #ffffff;
+            background-color: rgba(30, 30, 30, 0.4);
+            border-radius: 0 4px 4px 0;
+            text-align: justify;
+            line-height: 1.8;
+            transition: all 0.3s ease;
+        }
+        
+        .story-text:hover {
+            background-color: rgba(40, 40, 40, 0.5);
+        }
+        
+        .vox-dialogue {
+            color: #ff6b6b;
+            font-weight: 500;
+        }
+        
+        .character-dialogue {
+            color: #4ecdc4;
+            font-style: italic;
+        }
+        
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 30px;
+        }
+        
+        .choice-btn {
+            background-color: transparent;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            border-radius: 2px;
+            padding: 16px 22px;
+            font-size: 1.15em;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .choice-btn::before {
+            content: "▶";
+            position: absolute;
+            left: 10px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .choice-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(8px);
+            padding-left: 35px;
+            border-color: #ff6b6b;
+        }
+        
+        .choice-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            border-color: #666666;
+        }
+        
+        .choice-btn:disabled:hover {
+            padding-left: 22px;
+            background-color: transparent;
+        }
+        
+        .choice-btn:disabled:hover::before {
+            opacity: 0;
+        }
+        
+        .game-stats {
+            border: 2px solid #ffffff;
+            border-radius: 2px;
+            padding: 18px;
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95em;
+            background-color: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+        
+        .stats-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stats-label {
+            font-size: 0.85em;
+            color: #aaaaaa;
+            margin-bottom: 5px;
+        }
+        
+        .stats-value {
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        
+        .endings-container {
+            border: 2px solid #ffffff;
+            border-radius: 2px;
+            padding: 25px;
+            margin-top: 25px;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.85);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+        
+        .endings-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 1px solid #ffffff;
+            padding-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        
+        .endings-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .ending-badge {
+            border: 1px solid #ffffff;
+            border-radius: 2px;
+            padding: 12px 15px;
+            font-size: 0.95em;
+            text-align: center;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .ending-unlocked {
+            background-color: rgba(30, 60, 30, 0.5);
+            border-color: #4ecdc4;
+            box-shadow: 0 0 8px rgba(78, 205, 196, 0.3);
+        }
+        
+        .ending-unlocked:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(78, 205, 196, 0.4);
+        }
+        
+        .ending-locked {
+            background-color: rgba(30, 30, 30, 0.7);
+            opacity: 0.7;
+        }
+        
+        .ending-id {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        
+        .ending-title {
+            font-size: 0.9em;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .control-btn {
+            background-color: transparent;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            border-radius: 2px;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+        
+        .control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: #ff6b6b;
+        }
+        
+        .luck-roll {
+            font-style: italic;
+            border-top: 1px dashed #ffffff;
+            padding-top: 15px;
+            margin-top: 20px;
+            color: #ffd166;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        
+        .ending-text {
+            font-size: 1.4em;
+            font-weight: 500;
+            text-align: center;
+            padding: 30px;
+            border: 3px solid #ffffff;
+            margin-top: 20px;
+            background-color: rgba(20, 20, 20, 0.8);
+            border-radius: 4px;
+            line-height: 1.8;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+            position: relative;
+        }
+        
+        .ending-text::before {
+            content: "✦";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.5em;
+            color: #ff6b6b;
+        }
+        
+        .ending-text::after {
+            content: "✦";
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            color: #ff6b6b;
+        }
+        
+        .path-display {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #aaaaaa;
+            border-top: 1px solid #333333;
+            padding-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .path-icon {
+            font-size: 1.2em;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .game-container {
+                padding: 20px;
+                min-height: 420px;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+            
+            .story-text {
+                font-size: 1.15em;
+                padding: 15px;
+            }
+            
+            .choice-btn {
+                padding: 14px 18px;
+                font-size: 1.05em;
+            }
+            
+            .endings-list {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+            }
+            
+            .control-btn {
+                min-width: 130px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.7em;
+            }
+            
+            .story-text {
+                font-size: 1.1em;
+            }
+            
+            .game-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .endings-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-btn {
+                min-width: 100%;
+            }
+            .author-info {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            color: #aaaaaa;
+            font-size: 0.9em;
+            border-top: 1px solid #333333;
+            padding-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">Vox Christmas Game</h1>
+    <div class="subtitle">罪诞快乐，Vox</div>
+    
+    <div class="game-container" id="gameContainer">
+        <div class="story-text fade-in" id="storyText">
+            那场灾难性的战斗过后，你，Vox，地狱里曾经最有声望的家伙，如今只剩下一个头颅，这不太妙。罪诞铃声在远处响起，提醒你这是绝佳的机会——以获得你的身体为目标前进吧！
+        </div>
+        
+        <div class="choices-container" id="choicesContainer">
+            <!-- 选项将由JavaScript动态生成 -->
+        </div>
+        
+        <div class="path-display">
+            <span class="path-icon">↳</span>
+            <span id="currentPath">当前位置: 起始点</span>
+        </div>
+    </div>
+    
+    <div class="game-stats">
+        <div class="stats-item">
+            <div class="stats-label">已解锁结局</div>
+            <div class="stats-value" id="endingsCount">0/8</div>
+        </div>
+        <div class="stats-item">
+            <div class="stats-label">游戏进度</div>
+            <div class="stats-value" id="gameProgress">0%</div>
+        </div>
+        <div class="stats-item">
+            <div class="stats-label">当前选择</div>
+            <div class="stats-value" id="choicesMade">0</div>
+        </div>
+    </div>
+    
+    <div class="endings-container" id="endingsContainer">
+        <div class="endings-title">收藏馆</div>
+        <div class="endings-list" id="endingsList">
+            <!-- 结局列表将由JavaScript动态生成 -->
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button class="control-btn" id="restartBtn">重新开始</button>
+        <button class="control-btn" id="showEndingsBtn">查看结局</button>
+        <button class="control-btn" id="hideEndingsBtn" style="display:none;">返回游戏</button>
+        <button class="control-btn" id="hintBtn">游戏提示</button>
+    </div>
+
+<div class="author-info">作者：水熊虫汁&吸时上饮</div>
+
+    <script>
+        // 游戏数据
+        const storyData = {
+            // 起始点
+            "start": {
+                text: "那场灾难性的战斗过后，你，Vox，地狱里曾经最有声望的家伙，如今只剩下一个头颅，这不太妙。罪诞铃声在远处响起，提醒你这是绝佳的机会——以获得你的身体为目标前进吧！",
+                choices: [
+                    { text: "向Valentino求助", next: "valentinoStart" },
+                    { text: "向Velvette求助", next: "velvetteStart" },
+                    { text: "独自筹备", next: "aloneStart" },
+                    { text: "放弃尝试", next: "giveUp" }
+                ]
+            },
+            
+            // 向Valentino求助分支
+            "valentinoStart": {
+                text: "你知道Valentino不会轻易帮忙——他还在气头上呢。那副粉色镜片下是否还藏着一丝旧情？你决定做点什么来挽回他。",
+                choices: [
+                    { text: "送上一份精心准备的礼物", next: "valentinoGift" },
+                    { text: "写一封真诚的道歉信", next: "valentinoLetter" }
+                ]
+            },
+            
+            "valentinoGift": {
+                text: "Valentino慵懒地瞥了眼你递上的礼物盒，修长的手指并未接过。<span class='character-dialogue'>\"这次只是礼物可不够打发了，小平板。\"</span>他的声音带着不屑的嘲讽。",
+                choices: [
+                    { text: "转向Velvette求助 - 或许她能帮忙说服他", next: "valentinoVelvetteHelp" },
+                    { text: "放弃 - 也许你该接受现状", next: "ending6" }
+                ]
+            },
+            
+            "valentinoLetter": {
+                text: "你的道歉信被随意地扔在一边。<span class='character-dialogue'>\"又是这些空话，Voxxy。我已经听厌了。\"</span>Valentino的语气冰冷。显然，你需要更多诚意。",
+                choices: [
+                    { text: "补上一份特别的礼物", next: "valentinoLetterGift" },
+                    { text: "放弃尝试", next: "ending6" }
+                ]
+            },
+            
+            "valentinoLetterGift": {
+                text: "<span class='vox-dialogue'>你：</span>光有道歉确实不够...我还准备了礼物。",
+                choices: [
+                    { text: "鲨鱼周边大全套 - 你最喜欢的收藏", next: "ending3" },
+                    { text: "特殊设计的USB接口乳环 - 大胆的创意", next: "ending2" }
+                ]
+            },
+            
+            "valentinoVelvetteHelp": {
+                text: "你找到了正在布置圣诞装饰的Velvette。她挑眉看着你，<span class='character-dialogue'>\"哦？我们尊贵的神明先生需要帮助？\"</span>语气中满是讽刺。",
+                choices: [
+                    { text: "提出成为她的模特", next: "valentinoVelvetteModel" },
+                    { text: "送上为她准备的圣诞礼物", next: "valentinoVelvetteGift" },
+                    { text: "请求她帮忙挽回Valentino", next: "valentinoVelvetteParty" }
+                ]
+            },
+            
+            "valentinoVelvetteModel": {
+                text: "<span class='character-dialogue'>Velvette：</span>\"你的支持率已经跌到谷底了，Vox。而且我还没消气呢。\"她转身继续摆弄装饰品。",
+                next: "ending7"
+            },
+            
+            "valentinoVelvetteGift": {
+                text: "你带着礼物接近Velvette。<span class='vox-dialogue'>你：</span>圣诞快乐，我为你准备了点东西。",
+                choices: [
+                    { text: "投影戒指 - 字面意思：可以用来投影的戒指", next: "valentinoVelvetteRing" },
+                    { text: "专为她设计的新款手机 - 最新技术与定制外观", next: "valentinoVelvettePhone" }
+                ]
+            },
+            
+            "valentinoVelvetteRing": {
+                text: "Velvette接过戒指，仔细端详。<span class='character-dialogue'>\"品味真够烂的...不过，看得出你用心了。\"</span>她嘴角微微上扬。",
+                choices: [
+                    { text: "趁机请求拿回身体", next: "ending8" },
+                    { text: "提议一起筹备圣诞聚会", next: "ending1" },
+                    { text: "提出成为她的模特", next: "ending9" }
+                ]
+            },
+            
+            "valentinoVelvettePhone": {
+                text: "Velvette检查着新手机，把旧的那部随手扔进垃圾桶。<span class='character-dialogue'>\"嗯...功能不错，设计也算新颖。\"</span>她难得给出了正面评价。",
+                choices: [
+                    { text: "趁机请求拿回身体", next: "ending8" },
+                    { text: "提议一起筹备圣诞聚会", next: "ending1" },
+                    { text: "提出成为她的模特", next: "ending9" }
+                ]
+            },
+            
+            "valentinoVelvetteParty": {
+                text: "<span class='character-dialogue'>\"帮你？\"</span>她冷笑一声，朝你举了一个中指，<span class='character-dialogue'>\"我现在完全不想搭理你。Fuck off。\"</span>",
+                next: "ending7"
+            },
+            
+            // 向Velvette求助分支
+            "velvetteStart": {
+                text: "Velvette的时尚工作室里满是圣诞装饰。她正挑剔地调整着一棵黑色圣诞树上的银色装饰。<span class='character-dialogue'>\"说真的，Vox，你现在这样子还挺不错的。\"</span>",
+                choices: [
+                    { text: "提出成为她的模特", next: "velvetteModel" },
+                    { text: "送上为她准备的圣诞礼物", next: "velvetteGift" },
+                    { text: "提议一起筹备圣诞聚会", next: "velvetteParty" }
+                ]
+            },
+            
+            "velvetteModel": {
+                text: "<span class='character-dialogue'>Velvette：</span>\"你的支持率已经跌到谷底了，Vox。而且我还没消气呢。\"她转身继续摆弄装饰品。",
+                next: "ending7"
+            },
+            
+            "velvetteGift": {
+                text: "你带着礼物接近Velvette。<br><br><span class='vox-dialogue'>你：</span>圣诞快乐，我为你准备了点东西。",
+                choices: [
+                    { text: "投影戒指 - 字面意思：可以用来投影的戒指", next: "velvetteRing" },
+                    { text: "专为她设计的新款手机 - 最新技术与定制外观", next: "velvettePhone" }
+                ]
+            },
+            
+            "velvetteRing": {
+                text: "Velvette挑剔地审视着戒指，最终戴在了小指上。<span class='character-dialogue'>\"品味真够烂的...不过，看得出你用心了。\"</span>她嘴角微微上扬\"</span>",
+                choices: [
+                    { text: "提出成为她的模特", next: "velvetteRingModel" },
+                    { text: "直接请求拿回身体", next: "ending8" }
+                ]
+            },
+            
+            "velvetteRingModel": {
+                text: "获得身体后，Velvette给你换了一套又一套衣服，闪光灯不停闪烁。<span class='character-dialogue'>\"转身！侧面！完美！\"</span>她兴奋地指挥着。等等...那件小洋裙是怎么回事？！",
+                choices: [
+                    { text: "趁热打铁", next: "velvetteRingModelValentino" },
+                    { text: "就此满足", next: "ending9" },
+                    { text: "提议三人共度圣诞", next: "ending1" }
+                ]
+            },
+            
+            "velvetteRingModelValentino": {
+                text: "<span class='vox-dialogue'>你：</span>礼物应该能起作用...",
+                choices: [
+                    { text: "鲨鱼周边大全套 - 你最喜欢的收藏", next: "ending3" },
+                    { text: "特殊设计的USB接口乳环 - 大胆的示好", next: "ending2" }
+                ]
+            },
+            
+            "velvettePhone": {
+                text: "Velvette测试着新手机的各种功能，把旧的那部随手扔进垃圾桶。<span class='character-dialogue'>\"摄像头不错，运行也够快。算你有点眼光。\"</span>",
+                choices: [
+                    { text: "提出成为她的模特", next: "velvettePhoneModel" },
+                    { text: "直接请求拿回身体", next: "ending8" }
+                ]
+            },
+            
+            "velvettePhoneModel": {
+                text: "新手机的摄像头捕捉着每一个角度。Velvette给你换了一套又一套衣服，闪光灯不停闪烁。<span class='character-dialogue'>\"转身！侧面！完美！\"</span>她兴奋地指挥着。等等...那件小洋裙是怎么回事？！",
+                choices: [
+                    { text: "趁热打铁", next: "velvettePhoneModelValentino" },
+                    { text: "就此满足", next: "ending9" },
+                    { text: "提议三人共度圣诞", next: "ending1" }
+                ]
+            },
+            
+            "velvettePhoneModelValentino": {
+                text: "<span class='vox-dialogue'>你：</span>Valentino那边...一份合适的礼物可能有用。",
+                choices: [
+                    { text: "鲨鱼周边大全套 - 你最喜欢的收藏", next: "ending3" },
+                    { text: "特殊设计的USB接口乳环 - 大胆的示好", next: "ending2" }
+                ]
+            },
+            
+            "velvetteParty": {
+                text: "<span class='character-dialogue'>Velvette：</span>她甚至没有抬头，继续摆弄着装饰品。",
+                next: "ending7"
+            },
+            
+            // 独自筹备分支
+            "aloneStart": {
+                text: "你决定不依赖任何人。毕竟，你可是Vox科技的首脑！即使现在只剩一个头...",
+                choices: [
+                    { text: "命令", next: "aloneCommand" },
+                    { text: "催眠", next: "aloneHypnosis" }
+                ]
+            },
+            
+            "aloneCommand": {
+                text: "你召唤了一名员工。他走近时，你注意到他眼中的仇恨。<span class='character-dialogue'>\"记得我吗，Vox先生？我妻子死在你的武器下，而我也差点没命。\"</span>他抽出一把刀。",
+                next: "aloneCommandLuck"
+            },
+            
+            "aloneCommandLuck": {
+                text: "危险逼近！你必须立即做出反应——",
+                choices: [
+                    { text: "尝试用电线限制他 - 祈祷运气站在你这边", next: "aloneCommandRoll" }
+                ]
+            },
+            
+            "aloneCommandRoll": {
+                text: "命运的天平开始摇摆...",
+                next: "aloneCommandResult"
+            },
+            
+            "aloneCommandResult": {
+                text: "",
+                choices: []
+            },
+            
+            "aloneHypnosis": {
+                text: "你的左眼浮现黑色圈纹并向外扩散，员工的眼神逐渐涣散。几小时后，一具粗糙组装的身体完成了。你兴奋地连接上神经接口——四肢响应了！从跌跌撞撞到熟悉行动，你在手术床周围转了几圈。",
+                next: "aloneHypnosisResult"
+            },
+            
+            "aloneHypnosisResult": {
+                text: "最初的兴奋逐渐消退。你坐在冰冷的手术床上，望着空荡的实验室...这真的是你想要的吗？",
+                next: "ending4"
+            },
+            
+            // 放弃分支
+            "giveUp": {
+                text: "也许...这样也不错？至少你还活着，还有意识，何必强求太多。",
+                next: "ending6"
+            },
+            
+            // 结局
+            "ending1": {
+                text: "结局：温馨圣诞夜<br><br>Velvette和你一起精心策划的圣诞聚会打动了Valentino。3V再次齐聚一堂，在闪烁的圣诞树下共享温馨夜晚。你喝到了久违的思乐冰——虽然洒了一半，但谁在乎呢？",
+                isEnding: true,
+                endingId: 1,
+                endingTitle: "温馨圣诞夜",
+            },
+            
+            "ending2": {
+                text: "结局：豁出去的礼物<br><br>你豁出去了。Valentino为你的天线绑上了槲寄生，并给了你一个意味深长的吻。<span class='character-dialogue'>\" Merry Christmas, Voxxy.\"</span>",
+                isEnding: true,
+                endingId: 2,
+                endingTitle: "豁出去的礼物",
+            },
+            
+            "ending3": {
+                text: "结局：错误选择的惨痛教训<br><br>你的脸再次被揍爆了。Valentino带走了原本要送给你的礼物，以及Velvette。<span class='character-dialogue'>\"下次记得带脑子，小平板。哦，等等...\"</span>他的笑声在走廊回荡。",
+                isEnding: true,
+                endingId: 3,
+                endingTitle:"错误选择的惨痛教训"
+            },
+            
+            "ending4": {
+                text: "结局：你开心了，吗<br><br>你孤零零地坐在手术床上。你没有资格享受这个圣诞节。",
+                isEnding: true,
+                endingId: 4,
+                endingTitle: "你开心了，吗"
+            },
+
+ "ending5": {
+                text: "结局：回忆<br><br>你陷入了梦境，Alastor和你一起坐在炉火边，一边听着电台传出的爵士乐一边喝酒聊天。",
+                isEnding: true,
+                endingId: 5,
+                endingTitle: "回忆"
+            },
+            
+            "ending6": {
+                text: "结局：旁观者<br><br>你什么都不想做。圣诞节到了，你躺在沙发的一角，Valentino和Velvette在一旁欢乐地聊天，就像以往的每次那样。意外的不错？你想喝一口思乐冰……该死的，你没有手。你收回了前一句话。",
+                isEnding: true,
+                endingId: 6,
+                endingTitle: "旁观者"
+            },
+            
+            "ending8": {
+                text: "结局：孤独一人的圣诞夜<br><br>你被丢下了。他们甚至不想看到你，结伴出门享受节日氛围，独留你一人在塔里。你应该庆幸自己不是被丢出去了...大概吧。",
+                isEnding: true,
+                endingId: 8,
+                endingTitle: "孤独一人的圣诞夜",
+            },
+            
+            "ending9": {
+                text: "结局：圣诞模特<br><br>不错的圣诞模特。Velvette给你拍了无数张照片，换了无数套衣服（包括那件小洋裙）well，至少你现在有身体了。",
+                isEnding: true,
+                endingId: 9,
+                endingTitle: "圣诞模特",
+            },
+            
+            "ending7": {
+                text: "结局：徒劳无功的循环<br><br>你兜兜转转一圈又回到了起点，什么都没改变。圣诞钟声响起，你仍然只是个头颅。但至少...你还活着？这算是安慰吗？",
+                isEnding: true,
+                endingId: 7,
+                endingTitle:"徒劳无功的循环"
+            }
+        };
+
+        // 游戏状态
+        let gameState = {
+            currentScene: "start",
+            pathHistory: ["start"],
+            unlockedEndings: [],
+            allEndings: [
+                { id: 1, title: "温馨圣诞夜", unlocked: false },
+                { id: 2, title: "豁出去的礼物", unlocked: false },
+                { id: 3, title: "错误选择的惨痛教训", unlocked: false },
+                { id: 4, title: "你开心了，吗", unlocked: false },
+                { id: 5, title: "回忆", unlocked: false },
+                { id: 6, title: "旁观者", unlocked: false },
+                { id: 8, title: "孤独一人的圣诞夜", unlocked: false },
+                { id: 9, title: "圣诞模特", unlocked: false },
+                { id: 7, title: "徒劳无功的循环", unlocked: false }
+            ],
+            choicesCount: 0
+        };
+
+        // DOM元素
+        const storyTextElement = document.getElementById('storyText');
+        const choicesContainer = document.getElementById('choicesContainer');
+        const currentPathElement = document.getElementById('currentPath');
+        const endingsCountElement = document.getElementById('endingsCount');
+        const gameProgressElement = document.getElementById('gameProgress');
+        const choicesMadeElement = document.getElementById('choicesMade');
+        const endingsContainer = document.getElementById('endingsContainer');
+        const endingsListElement = document.getElementById('endingsList');
+        const restartBtn = document.getElementById('restartBtn');
+        const showEndingsBtn = document.getElementById('showEndingsBtn');
+        const hideEndingsBtn = document.getElementById('hideEndingsBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const gameContainer = document.getElementById('gameContainer');
+
+        // 初始化游戏
+        function initGame() {
+            loadGameState();
+            updateScene();
+            updateEndingsList();
+            updateGameStats();
+            
+            // 添加开场动画
+            storyTextElement.classList.add('fade-in');
+        }
+
+        // 加载游戏状态
+        function loadGameState() {
+            const savedState = localStorage.getItem('voxGameState');
+            if (savedState) {
+                const parsedState = JSON.parse(savedState);
+                // 合并保存的状态，确保新添加的结局也能被包含
+                parsedState.allEndings = gameState.allEndings.map(ending => {
+                    const savedEnding = parsedState.allEndings.find(e => e.id === ending.id);
+                    return savedEnding ? {...ending, unlocked: savedEnding.unlocked} : ending;
+                });
+                gameState = parsedState;
+            }
+        }
+
+        // 保存游戏状态
+        function saveGameState() {
+            localStorage.setItem('voxGameState', JSON.stringify(gameState));
+        }
+
+        // 更新场景
+        function updateScene() {
+            const scene = storyData[gameState.currentScene];
+            
+            // 特殊处理幸运判定场景
+            if (gameState.currentScene === "aloneCommandResult") {
+                const rollResult = Math.floor(Math.random() * 100) + 1;
+                let resultText = "";
+                let nextScene = "";
+                
+                if (rollResult > 50) {
+                    resultText = `<div class='luck-roll'>幸运判定: ${rollResult} > 50</div><br>正当你打算用电线限制住那个向你疯狂扑过来的罪人时，他被一枪爆头，倒在你边上。瓦伦蒂诺把你抱了起来，但也只是看了你一眼，什么都没说。`;
+                    nextScene = "ending7";
+                } else {
+                    resultText = `<div class='luck-roll'>幸运判定: ${rollResult} ≤ 50</div><br>你在行动时不小心从高处摔到地上，昏了过去。`;
+                    nextScene = "ending5";
+                }
+                
+                scene.text = resultText;
+                scene.choices = [{ text: "继续", next: nextScene }];
+            }
+            
+            // 显示场景文本
+            storyTextElement.innerHTML = scene.text;
+            storyTextElement.classList.add('fade-in');
+            
+            // 如果是结局，特殊处理
+            if (scene.isEnding) {
+                storyTextElement.innerHTML = `<div class="ending-text fade-in">${scene.text}</div>`;
+                
+                // 记录解锁的结局
+                if (!gameState.unlockedEndings.includes(scene.endingId)) {
+                    gameState.unlockedEndings.push(scene.endingId);
+                    
+                    // 更新全部结局中的解锁状态
+                    const ending = gameState.allEndings.find(e => e.id === scene.endingId);
+                    if (ending) {
+                        ending.unlocked = true;
+                    }
+                    
+                    updateGameStats();
+                    updateEndingsList();
+                    saveGameState();
+                    
+                    // 显示解锁通知
+                    showUnlockNotification(scene.endingTitle);
+                }
+                
+                // 结局后只显示重新开始按钮
+                choicesContainer.innerHTML = '';
+                const restartChoice = document.createElement('button');
+                restartChoice.className = 'choice-btn';
+                restartChoice.textContent = '重新开始游戏';
+                restartChoice.addEventListener('click', restartGame);
+                choicesContainer.appendChild(restartChoice);
+                
+                return;
+            }
+            
+            // 更新路径显示
+            updatePathDisplay();
+            
+            // 清空选项容器
+            choicesContainer.innerHTML = '';
+            
+            // 添加选项按钮
+            if (scene.choices && scene.choices.length > 0) {
+                scene.choices.forEach(choice => {
+                    const choiceButton = document.createElement('button');
+                    choiceButton.className = 'choice-btn fade-in';
+                    choiceButton.textContent = choice.text;
+                    choiceButton.addEventListener('click', () => {
+                        gameState.choicesCount++;
+                        makeChoice(choice.next);
+                    });
+                    choicesContainer.appendChild(choiceButton);
+                });
+            } else if (scene.next) {
+                // 如果只有一个后续路径
+                const choiceButton = document.createElement('button');
+                choiceButton.className = 'choice-btn fade-in';
+                choiceButton.textContent = '继续旅程';
+                choiceButton.addEventListener('click', () => {
+                    gameState.choicesCount++;
+                    makeChoice(scene.next);
+                });
+                choicesContainer.appendChild(choiceButton);
+            }
+            
+            // 更新游戏统计
+            updateGameStats();
+            
+            // 保存游戏状态
+            saveGameState();
+        }
+
+        // 显示解锁通知
+        function showUnlockNotification(endingTitle) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(30, 60, 30, 0.9);
+                color: white;
+                padding: 15px;
+                border: 2px solid #4ecdc4;
+                border-radius: 2px;
+                z-index: 1000;
+                box-shadow: 0 0 15px rgba(78, 205, 196, 0.5);
+                max-width: 300px;
+                animation: fadeIn 0.5s, fadeOut 0.5s 2.5s forwards;
+            `;
+            notification.innerHTML = `
+                <strong>新结局解锁！</strong><br>
+                ${endingTitle}
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // 做出选择
+        function makeChoice(nextSceneId) {
+            // 记录路径
+            gameState.pathHistory.push(nextSceneId);
+            gameState.currentScene = nextSceneId;
+            
+            // 移除所有淡入效果
+            document.querySelectorAll('.fade-in').forEach(el => {
+                el.classList.remove('fade-in');
+            });
+            
+            setTimeout(() => {
+                updateScene();
+            }, 50);
+        }
+
+        // 更新路径显示
+        function updatePathDisplay() {
+            const pathNames = gameState.pathHistory.map(sceneId => {
+                const scene = storyData[sceneId];
+                if (!scene) return "未知";
+                
+                if (scene.isEnding) {
+                    return `结局${scene.endingId}`;
+                }
+                
+                // 提取场景描述中的关键词
+                if (sceneId === "start") return "起始点";
+                if (sceneId.includes("valentino")) return "Valentino路线";
+                if (sceneId.includes("velvette")) return "Velvette路线";
+                if (sceneId.includes("alone")) return "独自筹备";
+                if (sceneId.includes("giveUp")) return "放弃路线";
+                
+                return "选择中";
+            });
+            
+            currentPathElement.textContent = `路径: ${pathNames.join(" → ")}`;
+        }
+
+        // 更新游戏统计
+        function updateGameStats() {
+            const unlockedCount = gameState.unlockedEndings.length;
+            const totalCount = gameState.allEndings.length;
+            const progress = Math.round((unlockedCount / totalCount) * 100);
+            
+            endingsCountElement.textContent = `${unlockedCount}/${totalCount}`;
+            gameProgressElement.textContent = `${progress}%`;
+            choicesMadeElement.textContent = gameState.choicesCount;
+        }
+
+        // 更新结局列表
+        function updateEndingsList() {
+            endingsListElement.innerHTML = '';
+            
+            // 按ID排序
+            const sortedEndings = [...gameState.allEndings].sort((a, b) => a.id - b.id);
+            
+            sortedEndings.forEach(ending => {
+                const endingBadge = document.createElement('div');
+                endingBadge.className = `ending-badge ${ending.unlocked ? 'ending-unlocked' : 'ending-locked'}`;
+                
+                endingBadge.innerHTML = `
+                    <div class="ending-id">结局 ${ending.id}</div>
+                    ${ending.unlocked ? `<div class="ending-title">${ending.title}</div>` : ''}
+                `;
+                
+                endingsListElement.appendChild(endingBadge);
+            });
+            
+            updateGameStats();
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            if (confirm("确定要重新开始游戏吗？当前进度将被保存，但当前选择路径将重置。")) {
+                gameState.currentScene = "start";
+                gameState.pathHistory = ["start"];
+                gameState.choicesCount = 0;
+                updateScene();
+                hideEndings();
+            }
+        }
+
+        // 显示结局收集
+        function showEndings() {
+            gameContainer.style.display = 'none';
+            endingsContainer.style.display = 'block';
+            showEndingsBtn.style.display = 'none';
+            hideEndingsBtn.style.display = 'block';
+            updateEndingsList();
+        }
+
+        // 隐藏结局收集
+        function hideEndings() {
+            gameContainer.style.display = 'block';
+            endingsContainer.style.display = 'none';
+            showEndingsBtn.style.display = 'block';
+            hideEndingsBtn.style.display = 'none';
+        }
+
+        // 显示游戏提示
+        function showHint() {
+            alert("游戏提示：\n\n1. 探索所有选项以解锁全部9个结局\n2. 游戏进度会自动保存\n3. 尝试不同的策略来影响Valentino和Velvette\n4. 游戏进度会自动保存\n\n祝你好运，Vox！");
+        }
+
+        // 事件监听
+        restartBtn.addEventListener('click', restartGame);
+        showEndingsBtn.addEventListener('click', showEndings);
+        hideEndingsBtn.addEventListener('click', hideEndings);
+        hintBtn.addEventListener('click', showHint);
+
+        // 初始化游戏
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
